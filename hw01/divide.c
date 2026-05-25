@@ -17,11 +17,11 @@ Result divide(int x, int y) {
     return res;
   }
 
-  Result prev = divide(x/2, y);
-  res.q = 2*prev.q;
-  res.r = 2*prev.r;
+  Result prev = divide(x >> 1, y);
+  res.q = prev.q << 1;
+  res.r = prev.r << 1;
 
-  if (x%2==1) {
+  if (x & 1) {
     res.r=res.r + 1;
   }
   if (res.r>=y) {
