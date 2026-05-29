@@ -57,8 +57,22 @@ class TrieNode {
 // Implement the main algorithm
 class Solution {
     private:
-    TrieNode* root = new TrieNode();
+    TrieNode* root;
+    void clearTrie(TrieNode* node) {
+        if (!node) return;
+        for (int i = 0; i < 26; i++) {
+            clearTrie(node->next[i]);
+        }
+        delete node;
+    }
     public:
+        Solution() {
+            root = new TrieNode();
+        }
+        ~Solution() {
+            clearTrie(root);
+        }
+        
         long long minCostToRepStr(string source, string target, 
             vector<string>& original, vector<string>& changed, vector<int>& cost) {
             // Step1: reverse strings in vector original and changed for dynamic programming.
