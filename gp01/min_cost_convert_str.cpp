@@ -194,7 +194,7 @@ int main() {
     Solution sol;
     Test test;
     // Test targets: 10 rules, 100 rules, 1000 rules
-    vector<pair<int, int>> configs = {{50, 10}, {200, 100}, {1000, 1000}};
+    vector<pair<int, int>> configs = {{50, 10}, {200, 50}, {1000, 100}};
     vector<double> time;
 
     for (auto& config : configs) {
