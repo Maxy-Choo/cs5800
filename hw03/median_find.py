@@ -3,86 +3,141 @@ import time
 import matplotlib.pyplot as plt
 import math
 
+def split(arr, left, right, pivot):
+    l = left
+    r = right
+    p = left
+    while p <= r:
+        if arr[p] < pivot:
+            arr[l], arr[p] = arr[p], arr[l]
+            l += 1
+            p += 1
+        elif arr[p] > pivot:
+            arr[p], arr[r] = arr[r], arr[p]
+            r -= 1
+        else:
+            p += 1
+    return l, r
 
-def find_median_rand_pivot(arr):
+
+# 1. Random Pivot
+def find_median_rand_pivot(arr, k):
     n = len(arr)
     left = 0
-    right = n
-    while left < right:
+    right = n-1
+    while left <= right:
         idx = random.randint(left, right)
         pivot = arr[idx]
-        l = left
-        r = right-1
-        while l <= r:
-            if arr[l] < pivot:
-                l += 1
-            else:
-                arr[l], arr[r] = arr[r], arr[l]
-                r -= 1
-        if l < r-l+1:
-            left = l
+        l, r = split(arr, left, right, pivot)
+
+        if k < l:
+            right = l - 1
+        elif k > r:
+            left = r + 1
         else:
-            right = l
+            return arr[k]
 
-    return arr[left] if n % 2 == 1 else (arr[left]+arr[left+1])/2.0
+    return arr[left]
 
-def good_split(arr):
-    n = len(arr)
+# 2. Split always in the 25%-75% range
+def quicksort(arr, left, right):
+    stack = [(left, right)]
+    while stack:
+        left, right = stack.pop()
+        if left >= right:
+            continue
+        pivot = arr[right]
+        i, j = split(arr, left, right, pivot)
+        stack.append((left, i-1))
+        stack.append((j+1, right))
+
+def median_of_median(arr, left, right):
+    """
+    Find a good pivot of an array by dividing it into groups of 5 and finding
+    the median of each group, then finding the median of these medians.
+    P = 1/5 + 1/25 + 1/125 + ... = 3/10, so the pivot is guaranteed to be in
+    the 25%-75% range.
+    """
+    n = right - left + 1
     if n <= 5:
-        a.sort()
-    return a[n//2]
+        sub = arr[left:right+1]
+        quicksort(sub, 0, len(sub)-1)
+        return sub[n // 2]
 
     group = []
-    for i in range(0, n, 5):
-        sub = a[i:i+5]
-        sub.sort()
-        group.append(sub[2])
+    for i in range(left, right+1, 5):
+        sub = arr[i:min(i+5, right+1)]
+        quicksort(sub, 0, len(sub)-1)
+        group.append(sub[len(sub)//2])
 
     return find_median_good_split(group, len(group)//2)
 
-def split(arr, pivot):
-    i = 0
-    r = 0
-    j = len(arr)-1
-    while r <= j:
-        if arr[r] < pivot:
-            arr[i], arr[r] = arr[r], arr[i]
-            i += 1
-            r += 1
-        elif arr[r] > pivot:
-            arr[r], arr[j] = arr[j], arr[r]
-            j -= 1
-        else:
-            r += 1
-    return i, r, j
-        
-
 def find_median_good_split(arr, k):
-    if len(arr) == 1:
-        return arr[0]
+    left = 0
+    right = len(arr)-1
+    while left <= right:
+        pivot = median_of_median(arr, left, right)
+        i, j = split(arr, left, right, pivot)
+        if k < i:
+            right = i - 1
+        elif k > j:
+            left = j + 1
+        else:
+            return arr[k]
 
-    pivot = good_split(arr)
-    i, r, j = split(arr, pivot)
-    if k < i:
-        return find_median_good_split(arr[:i], k)
-    elif i <= k <= j:
-        return arr[k]
-    else:
-        return find_median_good_split(arr[j+1:], k-j-1)
+    return arr[left]
         
 
-if "__name__" == "__main__":
-    time_arr = []
-    size_arr = [pow(10, i) for i in range(1, 7)]
-    for i in range(1, 7):
-        arr = [random.randint(0, 100000) for _ in range(pow(10, i))]
-        start = time.performance_t()
-        ans = find_median_rand_pivot(arr)
-        end = time.performance_t()
-        time_arr.append(end-start)
+if __name__ == "__main__":
+    time_arr_rand = []
+    time_arr_good = []
+    time_arr_sort = []
+    time_arr_sort2 = []
+    size_arr = [pow(10, i) for i in range(1, 4)]
+    for i in range(1, 4):
+        arr1 = [random.randint(0, 100000) for _ in range(pow(10, i))]
+        arr2 = arr1.copy()
+        arr3 = arr1.copy()
+        arr4 = arr1.copy()
+        tmp = 0
+        for _ in range(5):
+            start = time.perf_counter()
+            ans = find_median_rand_pivot(arr1, len(arr1)//2)
+            end = time.perf_counter()
+            tmp += end - start
+        time_arr_rand.append(tmp / 5)
 
-    plt(size_arr, time_arr)
+        tmp = 0
+        for _ in range(5):
+            start = time.perf_counter()
+            ans = find_median_good_split(arr2, len(arr2)//2)
+            end = time.perf_counter()
+            tmp += end - start
+        time_arr_good.append(tmp / 5)
+
+        tmp = 0
+        for _ in range(5):
+            start = time.perf_counter()
+            ans = sorted(arr3)[len(arr3)//2]
+            end = time.perf_counter()
+            tmp += end - start
+        time_arr_sort.append(tmp / 5)
+
+        tmp = 0
+        for _ in range(5):
+            start = time.perf_counter()
+            quicksort(arr4, 0, len(arr4)-1)
+            ans = arr4[len(arr4)//2]
+            end = time.perf_counter()
+            tmp += end - start
+        time_arr_sort2.append(tmp / 5)
+
+    plt.plot(size_arr, time_arr_rand, label="Random Pivot")
+    plt.plot(size_arr, time_arr_good, label="Good Split")
+    plt.plot(size_arr, time_arr_sort, label="Built-in Sort")
+    plt.plot(size_arr, time_arr_sort2, label="Iterative Quick Sort")
     plt.xlabel("size")
     plt.ylabel("time(s)")
-    plt.title("Performance of Median Finding using Random Pivot Sorting")
+    plt.title("Performance of Median Finding")
+    plt.legend()
     plt.show()
