@@ -193,13 +193,14 @@ TestCase generateInput(int strLen, int numRules) {
 int main() {
     Solution sol;
     Test test;
-    // Test targets: 10 rules, 100 rules, 1000 rules
-    vector<pair<int, int>> configs = {{50, 10}, {200, 50}, {1000, 100}};
-    vector<double> time;
+    // Test targets: 10 rules, 100 rules, 1000
+    vector<double> time_10;
+    vector<double> time_50;
+    vector<double> time_100;
 
-    for (auto& config : configs) {
-        int strLen = config.first;
-        int numRules = config.second;
+    for (int i=10; i<=1000; i+=10) {
+        int strLen = i;
+        int numRules = 10;
 
         Test::TestCase tc =test.generateInput(strLen, numRules);
 
@@ -208,14 +209,55 @@ int main() {
         auto end = chrono::high_resolution_clock::now();
 
         chrono::duration<double, milli> elapsed = end - start;
-        time.push_back(elapsed.count());
+        time_10.push_back(elapsed.count());
     }
 
+    for (int i=10; i<=1000; i+=10) {
+        int strLen = i;
+        int numRules = 50;
+
+        Test::TestCase tc =test.generateInput(strLen, numRules);
+
+        auto start = chrono::high_resolution_clock::now();
+        long long result = sol.minCostToRepStr(tc.source, tc.target, tc.original, tc.changed, tc.cost);
+        auto end = chrono::high_resolution_clock::now();
+
+        chrono::duration<double, milli> elapsed = end - start;
+        time_50.push_back(elapsed.count());
+    }
+
+    for (int i=10; i<=1000; i+=10) {
+        int strLen = i;
+        int numRules = 100;
+
+        Test::TestCase tc =test.generateInput(strLen, numRules);
+
+        auto start = chrono::high_resolution_clock::now();
+        long long result = sol.minCostToRepStr(tc.source, tc.target, tc.original, tc.changed, tc.cost);
+        auto end = chrono::high_resolution_clock::now();
+
+        chrono::duration<double, milli> elapsed = end - start;
+        time_100.push_back(elapsed.count());
+    }
     ofstream outFile("time.csv");
     if (outFile) {
-        for (int i=0; i<time.size(); i++) {
-            outFile << time[i];
-            if (i<time.size()-1)
+        for (int i=0; i<time_10.size(); i++) {
+            outFile << time_10[i];
+            if (i<time_10.size()-1)
+                outFile << ",";
+        }
+        outFile << "\n";
+
+        for (int i=0; i<time_50.size(); i++) {
+            outFile << time_50[i];
+            if (i<time_50.size()-1)
+                outFile << ",";
+        }
+        outFile << "\n";
+    
+        for (int i=0; i<time_100.size(); i++) {
+            outFile << time_100[i];
+            if (i<time_100.size()-1)
                 outFile << ",";
         }
     }
