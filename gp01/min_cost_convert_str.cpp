@@ -205,7 +205,6 @@ TestCase generateInput(int strLen, int numRules) {
 
 // Time analysis
 int main() {
-    Solution sol;
     Test test;
     // Test targets: 10 rules, 100 rules, 1000
     vector<double> time_10;
@@ -213,6 +212,7 @@ int main() {
     vector<double> time_100;
 
     for (int i=10; i<=1000; i+=10) {
+        Solution sol;
         int strLen = i;
         int numRules = 10;
 
@@ -227,6 +227,7 @@ int main() {
     }
 
     for (int i=10; i<=1000; i+=10) {
+        Solution sol;
         int strLen = i;
         int numRules = 50;
 
@@ -241,6 +242,7 @@ int main() {
     }
 
     for (int i=10; i<=1000; i+=10) {
+        Solution sol;
         int strLen = i;
         int numRules = 100;
 
