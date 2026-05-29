@@ -36,7 +36,8 @@
 #include <algorithm>
 #include <unordered_set>
 #include <chrono>
-#include <ofstream>
+#include <fstream>
+#include <climits>
 
 using namespace std;
 
@@ -210,10 +211,10 @@ int main() {
         time.push_back(elapsed.count());
     }
 
-    ofstream outFile("./gp01/time.csv")
+    ofstream outFile("time.csv");
     if (outFile) {
         for (int i=0; i<time.size(); i++) {
-            outFile << t;
+            outFile << time[i];
             if (i<time.size()-1)
                 outFile << ",";
         }
