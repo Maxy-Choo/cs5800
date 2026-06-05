@@ -101,7 +101,7 @@ class Solution {
             }
 
             // Step4: pre-compute minimum cost among all nodes(v)
-            //        using Flyod-Warshall Algorithm.
+            //        using Floyd-Warshall Algorithm.
             //        T(n)=O(v^3), v=nodes_size<=200
             vector<vector<long long>> min_cost(node_size, vector<long long>(node_size, LLONG_MAX/3));
             for (int i=0; i<node_size; i++) min_cost[i][i] = 0;
@@ -175,26 +175,26 @@ TestCase generateInput(int strLen, int numRules) {
     for(int i = 0; i < strLen; ++i) tc.source += (char)('a' + rand() % 26);
     tc.target = tc.source;
 
-    // 2. Generate Rules (and apply some to Target to ensure a path exists)
+    // 2. Generate Rules
     for(int i = 0; i < numRules; ++i) {
-        int ruleLen = 1 + (rand() % 5); // Keep rules short for logic density
-        string s_orig = "";
+        int ruleLen = 1 + rand() % 999;
+        string s_org = "";
         string s_chg = "";
         for(int j = 0; j < ruleLen; ++j) {
-            s_orig += (char)('a' + rand() % 26);
+            s_org += (char)('a' + rand() % 26);
             s_chg += (char)('a' + rand() % 26);
         }
         
-        if (s_orig == s_chg) s_chg[0] = (s_chg[0] == 'z' ? 'a' : s_chg[0] + 1);
+        if (s_org == s_chg) s_chg[0] = (s_chg[0] == 'z' ? 'a' : s_chg[0] + 1);
 
-        tc.original.push_back(s_orig);
+        tc.original.push_back(s_org);
         tc.changed.push_back(s_chg);
         tc.cost.push_back(1 + (rand() % 1000));
 
         // Inject this rule into the target string randomly to guarantee solvability
         if (rand() % 5 == 0 && tc.target.length() >= (size_t)ruleLen) {
             size_t pos = rand() % (tc.target.length() - ruleLen + 1);
-            if (tc.target.substr(pos, ruleLen) == s_orig) {
+            if (tc.target.substr(pos, ruleLen) == s_org) {
                 tc.target.replace(pos, ruleLen, s_chg);
             }
         }
@@ -206,11 +206,12 @@ TestCase generateInput(int strLen, int numRules) {
 // Time analysis
 int main() {
     Test test;
-    // Test targets: 10 rules, 100 rules, 1000
+    // Test size of graph: 10, 50, 100 (x2 because there are original and changed strings)
     vector<double> time_10;
     vector<double> time_50;
     vector<double> time_100;
 
+    // 
     for (int i=10; i<=1000; i+=10) {
         Solution sol;
         int strLen = i;
