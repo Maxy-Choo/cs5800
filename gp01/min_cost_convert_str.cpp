@@ -177,7 +177,7 @@ TestCase generateInput(int strLen, int numRules) {
 
     // 2. Generate Rules
     for(int i = 0; i < numRules; ++i) {
-        int ruleLen = 1 + rand() % 999;
+        int ruleLen = 1 + rand() % (strLen - 1);
         string s_org = "";
         string s_chg = "";
         for(int j = 0; j < ruleLen; ++j) {
